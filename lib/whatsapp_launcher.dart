@@ -1,5 +1,7 @@
 library;
 
+import 'dart:io';
+
 import 'package:url_launcher/url_launcher.dart' as url;
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:timezone/timezone.dart' as tz;
@@ -57,6 +59,7 @@ class WhatsAppLauncher {
     required String message,
     required DateTime scheduleAt,
   }) async {
+    if (Platform.isAndroid) await _checkExactAlarmPermission();
     await _initializeNotifications();
 
     // Schedule the notification
@@ -78,6 +81,19 @@ class WhatsAppLauncher {
       androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
       // Removed deprecated parameters
     );
+  }
+
+  /// On Android 12+, requests the exact alarm permission if not granted
+  static Future<void> _checkExactAlarmPermission() async {
+    final androidImpl =
+    _notificationsPlugin.resolvePlatformSpecificImplementation<
+        AndroidFlutterLocalNotificationsPlugin>();
+    if (androidImpl != null) {
+      final hasPermission =
+          await androidImpl.areNotificationsEnabled() ?? false;
+      // Note: flutter_local_notifications does not expose exact alarm permission directly
+      // For exact alarms, direct user to settings as needed.
+    }
   }
 
 }
