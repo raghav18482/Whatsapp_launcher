@@ -59,6 +59,7 @@ class WhatsAppLauncher {
   }) async {
     await _initializeNotifications();
 
+    // Schedule the notification
     await _notificationsPlugin.zonedSchedule(
       0,
       'Scheduled WhatsApp Message',
@@ -73,10 +74,9 @@ class WhatsAppLauncher {
           icon: '@mipmap/ic_launcher',
         ),
       ),
-      androidAllowWhileIdle: true,
       payload: '$phoneNumber|$message',
-      uiLocalNotificationDateInterpretation:
-      UILocalNotificationDateInterpretation.absoluteTime,
+      androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
+      // Removed deprecated parameters
     );
   }
 
