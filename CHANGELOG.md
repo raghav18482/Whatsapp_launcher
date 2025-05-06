@@ -1,6 +1,6 @@
 # Changelog
 
-## [1.0.0] - 2024-03-19
+## [1.0.1] - 2024-03-19
 
 ### Added
 - Initial release with basic WhatsApp message launching functionality
