@@ -11,7 +11,7 @@ and the Flutter guide for
 [developing packages and plugins](https://flutter.dev/to/develop-packages).
 -->
 
-A Flutter plugin that provides a simple way to launch WhatsApp conversations with pre-filled messages using the official WhatsApp deep linking system.
+A Flutter plugin that provides a simple way to launch WhatsApp conversations with pre-filled messages using the official WhatsApp deep linking system. Supports both immediate and scheduled message sending.
 
 # whatsapp_launcher
 
@@ -21,6 +21,7 @@ A Flutter plugin to launch WhatsApp with a phone number and a pre-filled message
 
 - Open WhatsApp chat for a specific phone number
 - Send pre-filled messages
+- Schedule messages for future delivery
 - Simple and easy-to-use API
 - Supports both Android and iOS platforms
 - Handles error cases gracefully
@@ -41,6 +42,7 @@ Here's a simple example of how to use the plugin:
 ```dart
 import 'package:whatsapp_launcher/whatsapp_launcher.dart';
 
+// Send message immediately
 void sendMessage() async {
   bool launched = await WhatsAppLauncher.launchWhatsAppMessage(
     phoneNumber: '919999999999', // Use international format without '+'
@@ -51,12 +53,26 @@ void sendMessage() async {
     print('Could not open WhatsApp');
   }
 }
+
+// Schedule a message
+void scheduleMessage() async {
+  bool scheduled = await WhatsAppLauncher.scheduleWhatsAppMessage(
+    phoneNumber: '919999999999',
+    message: 'This is a scheduled message!',
+    scheduledTime: DateTime.now().add(Duration(hours: 2)), // Schedule for 2 hours later
+  );
+
+  if (!scheduled) {
+    print('Could not schedule WhatsApp message');
+  }
+}
 ```
 
 ### Parameters
 
 - `phoneNumber`: The recipient's phone number in international format without the '+' symbol (e.g., '919999999999')
 - `message`: The pre-filled message to be sent (optional)
+- `scheduledTime`: The DateTime when the message should be sent (for scheduled messages)
 
 ## Requirements
 

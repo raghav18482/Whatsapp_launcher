@@ -1,6 +1,9 @@
 library;
 
 import 'package:url_launcher/url_launcher.dart' as url;
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:timezone/timezone.dart' as tz;
+import 'package:timezone/data/latest.dart' as tz_data;
 
 class WhatsAppLauncher {
   /// Launches WhatsApp with the given phone number and message.
@@ -14,11 +17,67 @@ class WhatsAppLauncher {
   }) async {
     final encodedMessage = Uri.encodeComponent(message);
     final link = 'https://wa.me/$phoneNumber?text=$encodedMessage';
-
     return await url.launchUrl(
       Uri.parse(link),
       mode: url.LaunchMode.platformDefault,
     );
-    //return await canLaunchUrl(uri) ? launchUrl(uri, mode: LaunchMode.platformDefault) : false;
   }
+
+  static final FlutterLocalNotificationsPlugin _notificationsPlugin =
+  FlutterLocalNotificationsPlugin();
+  static bool _isInitialized = false;
+
+  static Future<void> _initializeNotifications() async {
+    if (_isInitialized) return;
+    tz_data.initializeTimeZones();
+
+    const androidInit = AndroidInitializationSettings('@mipmap/ic_launcher');
+    const settings = InitializationSettings(android: androidInit);
+
+    await _notificationsPlugin.initialize(
+      settings,
+      onDidReceiveNotificationResponse: (response) async {
+        final payload = response.payload;
+        if (payload != null) {
+          final parts = payload.split('|');
+          if (parts.length == 2) {
+            final phone = parts[0];
+            final msg = parts[1];
+            await launchWhatsAppMessage(phoneNumber: phone, message: msg);
+          }
+        }
+      },
+    );
+
+    _isInitialized = true;
+  }
+
+  static Future<void> scheduleWhatsAppMessage({
+    required String phoneNumber,
+    required String message,
+    required DateTime scheduleAt,
+  }) async {
+    await _initializeNotifications();
+
+    await _notificationsPlugin.zonedSchedule(
+      0,
+      'Scheduled WhatsApp Message',
+      'Tap to send your WhatsApp message.',
+      tz.TZDateTime.from(scheduleAt, tz.local),
+      const NotificationDetails(
+        android: AndroidNotificationDetails(
+          'whatsapp_channel_id',
+          'WhatsApp Message Scheduler',
+          importance: Importance.max,
+          priority: Priority.high,
+          icon: '@mipmap/ic_launcher',
+        ),
+      ),
+      androidAllowWhileIdle: true,
+      payload: '$phoneNumber|$message',
+      uiLocalNotificationDateInterpretation:
+      UILocalNotificationDateInterpretation.absoluteTime,
+    );
+  }
+
 }

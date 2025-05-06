@@ -1,6 +1,6 @@
 name: whatsapp_launcher
 description: "Flutter package"
-version: 0.0.1
+version: 1.0.0
 homepage: https://github.com/raghav18482/Whatsapp_launcher
 
 environment:
@@ -11,6 +11,8 @@ dependencies:
   flutter:
     sdk: flutter
   url_launcher: ^6.2.5
+  flutter_local_notifications: ^16.3.0
+  timezone: ^0.9.2
 
 dev_dependencies:
   flutter_test:
