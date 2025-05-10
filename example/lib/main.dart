@@ -107,6 +107,7 @@ class _WhatsAppDemoState extends State<WhatsAppDemo> {
                   phoneNumber: '919214529913', // Replace with test number
                   message: messageController.text,
                   scheduleAt: selectedDateTime!,
+                  context: context,
                 );
 
                 ScaffoldMessenger.of(context).showSnackBar(
